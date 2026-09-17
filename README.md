@@ -4,7 +4,7 @@ Desenvolvimento do projeto da disciplina de Programação Paralela.
 Professor: Rafael Nunes de Lima  
 Aluna: Ana Beatriz Agostinho Astle  
 
-### Objetivo do projeto
+## Objetivo do projeto
 
 O projeto utilizará o processamento de uma grande matriz de números.
 Para cada elemento da matriz deverá ser executada uma operação matematicamente custosa.
@@ -23,11 +23,11 @@ private static double calcular(double valor) {
 ```
 O objetivo será processar todos os elementos da matriz e produzir um resultado final.
 ___
-### Como rodar
+## Como rodar
 
 - JDK 26
 ___
-### Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 src/
@@ -51,10 +51,22 @@ resultados/
 
 
 ___
-### Diagrama de Arquitetura
+## Diagrama de Arquitetura
+
+### V1 - Baseline
+```mermaid
+flowchart TD
+    A[Matriz de entrada] --> B[Para cada linha i]
+    B --> C[Para cada coluna j]
+    C --> D["calcular(matriz[i][j])"]
+    D --> E[Acumula no resultado]
+    E --> C
+    C -->|todas as colunas processadas| B
+    B -->|todas as linhas processadas| F[Resultado final]
+```
 
 ___
-### Resultados
+## Resultados
 
 
 
