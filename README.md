@@ -46,7 +46,6 @@ resultados/
 ```
 
 - **`Main.java`** — orquestra a execução: chama cada versão, mede o tempo com `System.nanoTime()` e grava os resultados.
-- **`util/MatrizUtil.java`** — evita duplicar a geração da matriz em cada versão; garante que todas recebem exatamente a mesma entrada, o que é essencial pra comparação valer.
 - **`v1` a `v4`** — cada pacote isola uma estratégia de paralelismo, mas compartilham a mesma `calcular()` sem alterações (é o que torna o speedup comparável entre elas).
 - **`resultados/experimentos.csv`** — dados brutos dos experimentos (E1–E4), usados pra montar a tabela final e os gráficos, se você fizer algum.
 
