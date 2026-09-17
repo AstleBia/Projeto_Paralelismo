@@ -53,7 +53,7 @@ resultados/
 ___
 ## Diagrama de Arquitetura
 
-### V1 - Baseline
+### V1 - Sequencial - Baseline
 ```mermaid
 flowchart TD
     A[Matriz de entrada] --> B[Para cada linha i]
