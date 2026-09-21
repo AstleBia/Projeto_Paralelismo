@@ -1,13 +1,13 @@
-package v2;
+package v3;
 
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.Future;
+import java.util.concurrent.StructuredTaskScope;
+import java.util.function.Supplier;
 
-public class NaoEstruturada {
+public class Estruturada {
     private static double calcular(double valor) {
 
         double resultado = valor;
@@ -24,35 +24,35 @@ public class NaoEstruturada {
     }
 
     private static double processar(double[][] matriz) {
-
         double resultadoTotal = 0.0;
 
-        int numCores = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = Executors.newFixedThreadPool(numCores);
-        List<Future<Double>> resultados = new ArrayList<>();
+        try (var scope = StructuredTaskScope.open()) {
 
-        for (int i = 0; i < matriz.length; i++) {
-            final int linha = i;
-            Future<Double> resultado = executor.submit(() -> {
-                double somaLinha = 0.0;
-                for (int j = 0; j < matriz[linha].length; j++){
-                    somaLinha += calcular(matriz[linha][j]);
-                };
-                return somaLinha;
-            });
+            List<Supplier<Double>> subtasksLinhas = new ArrayList<>();
 
-            resultados.add(resultado);
-        }
 
-        for (Future<Double> resultado : resultados){
-            try {
-                resultadoTotal += resultado.get();
-            } catch (Exception e) {
-                System.err.println("Erro ao processar: " + e.getMessage());
+            for (int i = 0; i < matriz.length; i++){
+                final int linha = i;
+
+                Supplier<Double> subtask = scope.fork(() -> {
+                    double somaLinha = 0.0;
+                    for (int j=0; j< matriz[linha].length; j++){
+                        somaLinha += calcular(matriz[linha][j]);
+                    }
+                    return somaLinha;
+                });
+
+                subtasksLinhas.add(subtask);
+            }
+            scope.join();
+
+            for (Supplier<Double> subtask : subtasksLinhas){
+                resultadoTotal += subtask.get();
             }
         }
-
-        executor.shutdown();
+        catch (Exception e){
+            System.err.println("Erro ao processar matriz no escopo: " + e.getMessage());
+        }
 
         return resultadoTotal;
     }
