@@ -62,7 +62,7 @@ public class EstadoCompartilhado {
         return matriz;
     }
 
-    private static void executarProcessamento(int linhas, int colunas, int variante) {
+    private static void executarProcessamento(int linhas, int colunas) {
         System.out.println();
         System.out.println("==========================================");
         System.out.println("     PROCESSAMENTO ESTADO COMPARTILHADO ");
@@ -157,35 +157,19 @@ public class EstadoCompartilhado {
             switch (opcao) {
 
                 case 1:
-                    executarProcessamento(500, 500, 1);
+                    executarProcessamento(500, 500);
                     break;
 
                 case 2:
-                    executarProcessamento(1000, 1000, 1);
+                    executarProcessamento(1000, 1000);
                     break;
 
                 case 3:
-                    executarProcessamento(1500, 1500, 1);
+                    executarProcessamento(1500, 1500);
                     break;
 
                 case 4:
-                    executarProcessamento(2000, 2000, 1);
-                    break;
-
-                case 5:
-                    executarProcessamento(500, 500, 2);
-                    break;
-
-                case 6:
-                    executarProcessamento(1000, 1000, 2);
-                    break;
-
-                case 7:
-                    executarProcessamento(1500, 1500, 2);
-                    break;
-
-                case 8:
-                    executarProcessamento(2000, 2000, 2);
+                    executarProcessamento(2000, 2000);
                     break;
 
                 case 0:

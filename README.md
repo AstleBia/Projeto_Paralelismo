@@ -159,6 +159,19 @@ flowchart TD
     G --> H[Resultado final]
 ```
 
+### V4 - Estado Compartilhado - Variável Atômica
+```mermaid
+flowchart TD
+    A[Matriz de entrada] --> B[StructuredTaskScope.open]
+    B --> C[Para cada linha i]
+    C --> D["scope.fork: soma calcular() da linha"]
+    D --> E["resultadoTotal.add — DoubleAdder"]
+    E --> C
+    C -->|todas as linhas forkadas| F[scope.join]
+    F --> G[resultadoTotal.sum]
+    G --> H[Resultado final]
+```
+
 ___
 ## Resultados
 
