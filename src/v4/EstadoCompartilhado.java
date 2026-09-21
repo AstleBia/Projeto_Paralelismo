@@ -1,12 +1,13 @@
-package v3;
+package v4;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-public class Estruturada {
+public class EstadoCompartilhado {
     private static double calcular(double valor) {
 
         double resultado = valor;
@@ -23,37 +24,28 @@ public class Estruturada {
     }
 
     private static double processar(double[][] matriz) {
-        double resultadoTotal = 0.0;
+        DoubleAdder resultadoTotal = new DoubleAdder();
 
         try (var scope = StructuredTaskScope.open()) {
-
-            List<Supplier<Double>> subtasksLinhas = new ArrayList<>();
-
-
-            for (int i = 0; i < matriz.length; i++){
+            for (int i = 0; i < matriz.length; i++) {
                 final int linha = i;
-
-                Supplier<Double> subtask = scope.fork(() -> {
+                scope.fork(() -> {
                     double somaLinha = 0.0;
-                    for (int j=0; j< matriz[linha].length; j++){
+                    for (int j = 0; j < matriz[linha].length; j++) {
                         somaLinha += calcular(matriz[linha][j]);
                     }
-                    return somaLinha;
+                    resultadoTotal.add(somaLinha);
+                    return null;
                 });
-
-                subtasksLinhas.add(subtask);
             }
             scope.join();
-
-            for (Supplier<Double> subtask : subtasksLinhas){
-                resultadoTotal += subtask.get();
-            }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Erro ao processar matriz no escopo: " + e.getMessage());
         }
 
-        return resultadoTotal;
+        return resultadoTotal.sum();
+    }
+
     }
 
     private static double[][] gerarMatriz(int linhas, int colunas) {
