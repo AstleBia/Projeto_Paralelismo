@@ -25,7 +25,66 @@ O objetivo será processar todos os elementos da matriz e produzir um resultado 
 ___
 ## Como rodar
 
-- JDK 26
+**Pré-requisito:** JDK 26
+
+### 1. Compilar
+
+Na raiz do projeto:
+
+```bash
+javac -d out src/*.java src/v1/*.java src/v2/*.java
+```
+
+Os `.class` são gerados no diretório `out/`.
+
+### 2. Executar uma versão
+
+Cada versão tem seu próprio `main` com menu interativo:
+
+```bash
+java -cp out Main                # versão base fornecida pelo professor (sequencial)
+java -cp out v1.Sequencial       # v1 — baseline sequencial
+java -cp out v2.NaoEstruturada   # v2 — paralelismo não estruturado (ExecutorService)
+```
+
+No menu, escolha o tamanho da matriz:
+
+```
+1 - Matriz 500 x 500
+2 - Matriz 1000 x 1000
+3 - Matriz 1500 x 1500
+4 - Matriz 2000 x 2000
+0 - Exit
+```
+
+A saída exibe o resultado da soma de todos os elementos e o tempo de processamento (ms e segundos).
+
+### 3. Testar / reproduzir os experimentos
+
+Para rodar sem interação, envie as opções pela entrada padrão:
+
+```bash
+# uma execução da matriz 500x500 em cada versão
+printf '1\n0\n' | java -cp out v1.Sequencial
+printf '1\n0\n' | java -cp out v2.NaoEstruturada
+```
+
+**Verificação de corretude:** a matriz é gerada de forma determinística, então todas as versões devem imprimir **exatamente o mesmo resultado** para um mesmo tamanho. Referências:
+
+| Matriz    | Resultado esperado |
+|-----------|--------------------|
+| 500×500   | 1264682.830998     |
+| 1000×1000 | 5058731.323995     |
+| 1500×1500 | 11382145.478991    |
+| 2000×2000 | 20234925.296071    |
+
+Se alguma versão paralela produzir valor diferente da baseline, há problema na implementação.
+
+Para reproduzir a metodologia da seção [Resultados](#resultados) (10 rodadas por configuração, média aritmética), repita a opção desejada 10 vezes antes do `0`:
+
+```bash
+printf '1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n0\n' | java -cp out v2.NaoEstruturada
+```
 ___
 ## Estrutura do Projeto
 
