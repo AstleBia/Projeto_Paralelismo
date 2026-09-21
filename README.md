@@ -32,20 +32,24 @@ ___
 Na raiz do projeto:
 
 ```bash
-javac -d out src/*.java src/v1/*.java src/v2/*.java
+javac -d out src/*.java src/*/*.java
 ```
 
-Os `.class` são gerados no diretório `out/`.
+O padrão `src/*/*.java` compila todas as versões existentes (v1–v4). Os `.class` são gerados no diretório `out/`.
 
 ### 2. Executar uma versão
 
 Cada versão tem seu próprio `main` com menu interativo:
 
 ```bash
-java -cp out Main                # versão base fornecida pelo professor (sequencial)
-java -cp out v1.Sequencial       # v1 — baseline sequencial
-java -cp out v2.NaoEstruturada   # v2 — paralelismo não estruturado (ExecutorService)
+java -cp out Main                    # versão base fornecida pelo professor (sequencial)
+java -cp out v1.Sequencial           # v1 — baseline sequencial
+java -cp out v2.NaoEstruturada       # v2 — paralelismo não estruturado (ExecutorService)
+java -cp out v3.Estruturado          # v3 — paralelismo estruturado (StructuredTaskScope)
+java -cp out v4.EstadoCompartilhado  # v4 — estado compartilhado (AtomicInteger / coleção concorrente)
 ```
+
+> **Nota:** v3 e v4 ainda estão em desenvolvimento — os comandos acima já estão previstos para quando forem implementadas.
 
 No menu, escolha o tamanho da matriz:
 
@@ -67,6 +71,8 @@ Para rodar sem interação, envie as opções pela entrada padrão:
 # uma execução da matriz 500x500 em cada versão
 printf '1\n0\n' | java -cp out v1.Sequencial
 printf '1\n0\n' | java -cp out v2.NaoEstruturada
+printf '1\n0\n' | java -cp out v3.Estruturado
+printf '1\n0\n' | java -cp out v4.EstadoCompartilhado
 ```
 
 **Verificação de corretude:** a matriz é gerada de forma determinística, então todas as versões devem imprimir **exatamente o mesmo resultado** para um mesmo tamanho. Referências:
