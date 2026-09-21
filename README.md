@@ -35,7 +35,7 @@ src/
 ├── v1/
 │   └── Sequencial.java          # calcular() + processar() — baseline, sem paralelismo
 ├── v2/
-│   └── NaoEstruturado.java      # calcular() + processarParalelo() com ExecutorService/threads manuais
+│   └── NaoEstruturada.java      # calcular() + processarParalelo() com ExecutorService/threads manuais
 ├── v3/
 │   └── Estruturado.java         # calcular() + processarEstruturado() com StructuredTaskScope
 └── v4/
@@ -64,9 +64,70 @@ flowchart TD
     C -->|todas as colunas processadas| B
     B -->|todas as linhas processadas| F[Resultado final]
 ```
+### V2 - Não Estruturada
+
+```mermaid
+flowchart TD
+    A[Matriz de entrada] --> B[Para cada elemento i,j]
+    B --> C["executor.submit: calcular(matriz[i][j])"]
+    C --> D[Future adicionado à lista]
+    D --> B
+    B -->|todos os elementos submetidos| E["Aguarda cada Future: future.get()"]
+    E --> F[Soma dos resultados parciais]
+    F --> G[Resultado final]
+```
 
 ___
 ## Resultados
+
+Metodologia: cada configuração foi executada 10 vezes; os valores abaixo são a média aritmética.
+Ambiente: Apple M4 (10 núcleos), 16 GB RAM, OpenJDK 26.0.2.1, macOS.
+Dados brutos de todas as execuções em [`resultados/experimentos.csv`](resultados/experimentos.csv).
+
+### E1 — Matriz 500×500
+
+| Implementação                          | Tarefas   | Tempo médio (ms) | Speedup | Resultado correto |
+|-----------------------------------------|-----------|-------------------|---------|--------------------|
+| Sequencial                              | -         | 1901.961          | 1.00    | -                  |
+| Paralelismo não estruturado             | 250.000   | 384.121           | 4.95    | ✓                  |
+| Paralelismo estruturado                 |           |                   |         |                    |
+| Estruturado + AtomicInteger             |           |                   |         |                    |
+| Estruturado + coleção concorrente       |           |                   |         |                    |
+
+### E2 — Matriz 1000×1000
+
+| Implementação                          | Tarefas   | Tempo médio (ms) | Speedup | Resultado correto |
+|-----------------------------------------|-----------|-------------------|---------|--------------------|
+| Sequencial                              | -         | 7575.528          | 1.00    | -                  |
+| Paralelismo não estruturado             | 1.000.000 | 1738.497          | 4.36    | ✓                  |
+| Paralelismo estruturado                 |           |                   |         |                    |
+| Estruturado + AtomicInteger             |           |                   |         |                    |
+| Estruturado + coleção concorrente       |           |                   |         |                    |
+
+### E3 — Matriz 1500×1500
+
+| Implementação                          | Tarefas   | Tempo médio (ms) | Speedup | Resultado correto |
+|-----------------------------------------|-----------|-------------------|---------|--------------------|
+| Sequencial                              | -         | 17093.514         | 1.00    | -                  |
+| Paralelismo não estruturado             | 2.250.000 | 3903.985          | 4.38    | ✓                  |
+| Paralelismo estruturado                 |           |                   |         |                    |
+| Estruturado + AtomicInteger             |           |                   |         |                    |
+| Estruturado + coleção concorrente       |           |                   |         |                    |
+
+### E4 — Matriz 2000×2000
+
+| Implementação                          | Tarefas   | Tempo médio (ms) | Speedup | Resultado correto |
+|-----------------------------------------|-----------|-------------------|---------|--------------------|
+| Sequencial                              | -         | 30289.086         | 1.00    | -                  |
+| Paralelismo não estruturado             | 4.000.000 | 9602.464          | 3.15    | ✓                  |
+| Paralelismo estruturado                 |           |                   |         |                    |
+| Estruturado + AtomicInteger             |           |                   |         |                    |
+| Estruturado + coleção concorrente       |           |                   |         |                    |
+
+### Observações
+
+- O resultado final é idêntico entre a versão sequencial e a não estruturada nos quatro tamanhos de matriz (ex.: E1 = `1264682.830998` em ambas), confirmando a corretude da paralelização.
+- O speedup cai de ~4,4–4,95 para 3,15 no E4. A causa é a granularidade fina da v2 (uma tarefa por elemento): com 4 milhões de microtarefas, o custo de escalonamento e de alocação dos `Future`s passa a dominar parte do tempo de execução.
 
 
 
