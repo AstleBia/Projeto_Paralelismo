@@ -1,11 +1,8 @@
 package v4;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.DoubleAdder;
 
 public class EstadoCompartilhado {
     private static double calcular(double valor) {
@@ -24,11 +21,14 @@ public class EstadoCompartilhado {
     }
 
     private static double processar(double[][] matriz) {
+
         DoubleAdder resultadoTotal = new DoubleAdder();
 
         try (var scope = StructuredTaskScope.open()) {
+
             for (int i = 0; i < matriz.length; i++) {
                 final int linha = i;
+
                 scope.fork(() -> {
                     double somaLinha = 0.0;
                     for (int j = 0; j < matriz[linha].length; j++) {
@@ -38,6 +38,7 @@ public class EstadoCompartilhado {
                     return null;
                 });
             }
+
             scope.join();
         } catch (Exception e) {
             System.err.println("Erro ao processar matriz no escopo: " + e.getMessage());
@@ -46,7 +47,6 @@ public class EstadoCompartilhado {
         return resultadoTotal.sum();
     }
 
-    }
 
     private static double[][] gerarMatriz(int linhas, int colunas) {
 
@@ -62,11 +62,10 @@ public class EstadoCompartilhado {
         return matriz;
     }
 
-    private static void executarProcessamento(int linhas, int colunas) {
-
+    private static void executarProcessamento(int linhas, int colunas, int variante) {
         System.out.println();
         System.out.println("==========================================");
-        System.out.println("       PROCESSAMENTO ESTRUTURADO ");
+        System.out.println("     PROCESSAMENTO ESTADO COMPARTILHADO ");
         System.out.println("==========================================");
 
         System.out.println(
@@ -91,13 +90,12 @@ public class EstadoCompartilhado {
 
         long inicio = System.nanoTime();
 
-        double resultado =
-                processar(matriz);
+        double resultado = processar(matriz);
+
 
         long fim = System.nanoTime();
 
-        long tempoNano =
-                fim - inicio;
+        long tempoNano = fim - inicio;
 
         double tempoMs =
                 tempoNano / 1_000_000.0;
@@ -130,10 +128,18 @@ public class EstadoCompartilhado {
         System.out.println("==========================================");
         System.out.println("      PROJETO DE COMPUTAÇÃO PARALELA");
         System.out.println("==========================================");
+        System.out.println("       Variável atômica (DoubleAdder)");
         System.out.println("1 - Matriz 500 x 500");
         System.out.println("2 - Matriz 1000 x 1000");
         System.out.println("3 - Matriz 1500 x 1500");
         System.out.println("4 - Matriz 2000 x 2000");
+        System.out.println("------------------------------------------");
+        System.out.println("  Coleção concorrente (ConcurrentLinkedQueue)");
+        System.out.println("5 - Matriz 500 x 500");
+        System.out.println("6 - Matriz 1000 x 1000");
+        System.out.println("7 - Matriz 1500 x 1500");
+        System.out.println("8 - Matriz 2000 x 2000");
+        System.out.println("------------------------------------------");
         System.out.println("0 - Exit");
         System.out.println("==========================================");
         System.out.print("Escolha uma opção: ");
@@ -151,30 +157,35 @@ public class EstadoCompartilhado {
             switch (opcao) {
 
                 case 1:
-                    executarProcessamento(
-                            500,
-                            500);
+                    executarProcessamento(500, 500, 1);
                     break;
-
 
                 case 2:
-                    executarProcessamento(
-                            1000,
-                            1000);
+                    executarProcessamento(1000, 1000, 1);
                     break;
-
 
                 case 3:
-                    executarProcessamento(
-                            1500,
-                            1500);
+                    executarProcessamento(1500, 1500, 1);
                     break;
 
-
                 case 4:
-                    executarProcessamento(
-                            2000,
-                            2000);
+                    executarProcessamento(2000, 2000, 1);
+                    break;
+
+                case 5:
+                    executarProcessamento(500, 500, 2);
+                    break;
+
+                case 6:
+                    executarProcessamento(1000, 1000, 2);
+                    break;
+
+                case 7:
+                    executarProcessamento(1500, 1500, 2);
+                    break;
+
+                case 8:
+                    executarProcessamento(2000, 2000, 2);
                     break;
 
                 case 0:
